@@ -1,6 +1,9 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using MyNetwork.Data;
+using MyNetwork.Models.Users;
 
 namespace MyNetwork
 {
@@ -10,6 +13,14 @@ namespace MyNetwork
         {
             var builder = WebApplication.CreateBuilder(args);
             string connection = builder.Configuration.GetConnectionString("DefaultConnection");
+            var mapperConfig = new MapperConfiguration((v) =>
+            {
+                v.AddProfile(new MappingProfile());
+            });
+
+            IMapper mapper = mapperConfig.CreateMapper();
+
+            builder.Services.AddSingleton(mapper);
 
             builder.Services
                 .AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connection))
