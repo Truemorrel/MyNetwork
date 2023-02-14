@@ -1,3 +1,7 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+
 namespace MyNetwork
 {
     public class Program
@@ -5,6 +9,18 @@ namespace MyNetwork
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            string connection = builder.Configuration.GetConnectionString("DefaultConnection");
+
+            builder.Services
+                .AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connection))
+                .AddIdentity<User, IdentityRole>(opts => {
+                    opts.Password.RequiredLength = 5;
+                    opts.Password.RequireNonAlphanumeric = false;
+                    opts.Password.RequireLowercase = false;
+                    opts.Password.RequireUppercase = false;
+                    opts.Password.RequireDigit = false;
+                })
+                    .AddEntityFrameworkStores<ApplicationDbContext>();
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
@@ -25,6 +41,7 @@ namespace MyNetwork
             app.UseRouting();
 
             app.UseAuthorization();
+            app.UseAuthentication();
 
             app.MapControllerRoute(
                 name: "default",
