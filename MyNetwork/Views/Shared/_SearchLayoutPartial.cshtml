@@ -1,0 +1,16 @@
+﻿<div class="search-container d-flex flex-row">
+	<form asp-area="" asp-controller="AccountManager" asp-action="Logout">
+		<partial name="_LoginPartial" />
+	</form>
+	<form asp-area="" asp-controller="Home" asp-action="Privacy">
+		<i class="fa fa-search"></i>
+		<input type="text" placeholder="Поиск" name="search">
+	</form>
+</div>
+
+@*<div class="search-container">
+    <form asp-area="" asp-controller="Home" asp-action="Privacy">
+        <i class="fa fa-search"></i>
+        <input type="text" placeholder="Поиск" name="search">
+	</form>
+</div>*@

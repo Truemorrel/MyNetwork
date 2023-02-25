@@ -1,0 +1,11 @@
+﻿@using Microsoft.AspNetCore.Identity;
+@using MyNetwork.Models.Users;
+@inject SignInManager<User> SignInManager
+@inject UserManager<User> UserManager
+
+@if (SignInManager.IsSignedIn(User))
+{
+	<form class="frm" asp-area="" asp-controller="AccountManager" asp-action="Logout" asp-route-returnUrl="@Url.Page("/", new { area = "" })" method="post">
+		<button type="submit" class="nav-link btn btn-link text-dark">Выход</button>
+	</form>
+}
