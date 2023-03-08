@@ -44,12 +44,8 @@ namespace MyNetwork.Controllers.Account
         {
             if (ModelState.IsValid)
             {
-
                 var user = _mapper.Map<User>(model); 
-				var userByEmail = await _signInManager.UserManager.FindByEmailAsync(user.Email.ToUpper());
-
-
-				var result = await _signInManager.PasswordSignInAsync(userByEmail, model.Password, isPersistent: model.RememberMe, false);
+				var result = await _signInManager.PasswordSignInAsync(user, model.Password, isPersistent: model.RememberMe, false);
 
 				if (result.Succeeded)
                 {
