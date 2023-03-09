@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using MyNetwork.Data;
+using MyNetwork.Data.Repository;
+using MyNetwork.Extentions;
 using MyNetwork.Models.Users;
 
 namespace MyNetwork
@@ -31,7 +33,11 @@ namespace MyNetwork
                     opts.Password.RequireUppercase = false;
                     opts.Password.RequireDigit = false;
                 })
-                    .AddEntityFrameworkStores<ApplicationDbContext>();
+                .AddEntityFrameworkStores<ApplicationDbContext>();
+            builder.Services
+                .AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connection))
+                .AddUnitOfWork()
+                .AddCustomRepository<Friend, FriendsRepository>();
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();

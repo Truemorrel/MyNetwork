@@ -1,4 +1,10 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Identity;
+@using MyNetwork.Models.Users;
+@inject SignInManager<User> SignInManager
+@inject UserManager<User> UserManager;
+
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -15,7 +21,16 @@
     <header class="border-bottom header background-white">
         <div class="container">
             <div class="topnav">
-                <a asp-area="" asp-controller="Home" asp-action="Index">SocialNetwork</a>
+                @if (!SignInManager.IsSignedIn(User))
+                {
+                    <a asp-area="" asp-controller="Home" asp-action="Index">SocialNetwork</a>
+                }
+                else
+
+                {
+                    <a asp-area="" asp-controller="AccountManager" asp-action="MyPage">SocialNetwork</a>
+                }
+                <partial name="_LoginPartial.cshtml" />
                 <partial name="_SearchLayoutPartial" />
             </div>
         </div>
@@ -28,7 +43,7 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2021 - AwesomeNetwork - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            &copy; 2021 - MyNetwork - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

@@ -12,10 +12,7 @@
 
 @if (SignInManager.IsSignedIn(User))
 {
-    <div>Hello @User.Identity!</div>
-	<div class="container">
-		<partial name="~/Views/User/MyPage.cshtml" model="UserView"/>
-	</div>
+
 
 }
 else

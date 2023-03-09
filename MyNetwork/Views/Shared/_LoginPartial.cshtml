@@ -5,8 +5,7 @@
 <div class="righ-align">
 	@if (SignInManager.IsSignedIn(User))
 	{
-		<button class="enter_submit" asp-area="" asp-controller="AccountManager" asp-action="Logout">Выход</button>
-		<form asp-area="" asp-controller="AccountManager" asp-action="Logout" asp-route-returnUrl="@Url.Page("/", new { area = "" })" method="post">
+		<form method="post" asp-controller="AccountManager" asp-action="Logout" >
 				<input class="enter_submit" type="submit" value="Выход" />
 		</form>
 	}

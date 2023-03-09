@@ -13,7 +13,7 @@ namespace MyNetwork.ViewModels.Account
         [Required]
         [DataType(DataType.Password)]
         [Display(Name = "Пароль", Prompt = "введите пароль")]
-        public string? Password { get; set; }
+        public string Password { get; set; } = null!;
 
         [Display(Name = "Запомнить?")]
         public bool RememberMe { get; set; }
