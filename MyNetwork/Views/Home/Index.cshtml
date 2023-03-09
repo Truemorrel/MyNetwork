@@ -14,7 +14,7 @@
 {
     <div>Hello @User.Identity!</div>
 	<div class="container">
-		<partial name="/Views/User/UserView" />
+		<partial name="~/Views/User/MyPage.cshtml" model="UserView"/>
 	</div>
 
 }
@@ -27,7 +27,6 @@ else
 			</div>
 			<img class="main-img" src="http://pngimg.com/uploads/husky/husky_PNG19.png" />
 		</div>
-
 
 		<div class="main">
 			<partial name="Login" model="Model.LoginView" />

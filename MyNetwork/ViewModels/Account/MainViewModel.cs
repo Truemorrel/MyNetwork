@@ -4,13 +4,13 @@
 	{
 		public RegisterViewModel RegisterView { get; set; }
 		public LoginViewModel LoginView { get; set; }
-        public UserViewModel UserView { get; set; }
+//        public UserViewModel UserView { get; set; }
 
         public MainViewModel()
 		{
 			RegisterView = new RegisterViewModel();
 			LoginView = new LoginViewModel();
-			UserView = new UserViewModel();
+//			UserView = new UserViewModel(new Models.Users.User());
 		}
 	}
 }

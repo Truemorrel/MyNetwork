@@ -18,7 +18,7 @@ namespace MyNetwork.Controllers
         [Route("[controller]/[action]")]
         public IActionResult Index()
         {
-            return View(new MainViewModel());
+			return View(new MainViewModel());
         }
 
         [Route("[action]")]

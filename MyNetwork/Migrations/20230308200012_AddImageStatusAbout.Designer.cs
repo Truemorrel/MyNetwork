@@ -12,8 +12,8 @@ using MyNetwork.Data;
 namespace MyNetwork.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230307010528_AddAboutImageStatus")]
-    partial class AddAboutImageStatus
+    [Migration("20230308200012_AddImageStatusAbout")]
+    partial class AddImageStatusAbout
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -164,7 +164,6 @@ namespace MyNetwork.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("About")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("AccessFailedCount")
@@ -189,7 +188,6 @@ namespace MyNetwork.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Image")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("LastName")
@@ -227,7 +225,6 @@ namespace MyNetwork.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Status")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("TwoFactorEnabled")

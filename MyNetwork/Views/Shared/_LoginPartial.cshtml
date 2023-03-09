@@ -2,10 +2,13 @@
 @using MyNetwork.Models.Users;
 @inject SignInManager<User> SignInManager
 @inject UserManager<User> UserManager
+<div class="righ-align">
+	@if (SignInManager.IsSignedIn(User))
+	{
+		<button class="enter_submit" asp-area="" asp-controller="AccountManager" asp-action="Logout">Выход</button>
+		<form asp-area="" asp-controller="AccountManager" asp-action="Logout" asp-route-returnUrl="@Url.Page("/", new { area = "" })" method="post">
+				<input class="enter_submit" type="submit" value="Выход" />
+		</form>
+	}
+</div>
 
-@if (SignInManager.IsSignedIn(User))
-{
-	<form class="frm" asp-area="" asp-controller="AccountManager" asp-action="Logout" asp-route-returnUrl="@Url.Page("/", new { area = "" })" method="post">
-		<button type="submit" class="nav-link btn btn-link text-dark">Выход</button>
-	</form>
-}

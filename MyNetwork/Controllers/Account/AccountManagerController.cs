@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Azure.Core;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using MyNetwork.Models;
@@ -34,7 +35,6 @@ namespace MyNetwork.Controllers.Account
         public IActionResult Login(string? returnUrl = null)
         {
             return View(new LoginViewModel { ReturnUrl = returnUrl }) ;
-            // new MainViewModel {LoginView = new LoginViewModel { ReturnUrl = returnUrl }, RegisterView = new RegisterViewModel() }
         }
 
 		[Route("Login")]
@@ -44,8 +44,9 @@ namespace MyNetwork.Controllers.Account
         {
             if (ModelState.IsValid)
             {
-                var user = _mapper.Map<User>(model); 
-				var result = await _signInManager.PasswordSignInAsync(user, model.Password, isPersistent: model.RememberMe, false);
+                var user = _mapper.Map<User>(model);
+                var userByEmail = await _userManager.FindByEmailAsync(user.Email!);
+				var result = await _signInManager.PasswordSignInAsync(userByEmail!, model.Password!, isPersistent: model.RememberMe, false);
 
 				if (result.Succeeded)
                 {
@@ -61,11 +62,56 @@ namespace MyNetwork.Controllers.Account
                 else
                 {
                     ModelState.AddModelError("", "Неправильный логин и (или) пароль");
-//                    return View("Views/Home/Index.cshtml", new MainViewModel { LoginView = model, RegisterView = new RegisterViewModel() });
+                    return View("Views/Home/Index.cshtml",
+                        new MainViewModel {
+                            LoginView = model,
+                            RegisterView = new RegisterViewModel()
+                        }
+                        );
                 }
             }
             return View("Views/Home/Index.cshtml");// return View("Views/Home/Index.cshtml", model)
 
+		}
+
+		[Authorize]
+		[Route("Update")]
+		[HttpPost]
+		public async Task<IActionResult> Update(UserEditViewModel model)
+		{
+			if (ModelState.IsValid)
+			{
+				var user = await _userManager.FindByIdAsync(model.UserId);
+
+				user.Convert(model);
+
+				var result = await _userManager.UpdateAsync(user);
+				if (result.Succeeded)
+				{
+					return RedirectToAction("MyPage", "AccountManager");
+				}
+				else
+				{
+					return RedirectToAction("Edit", "AccountManager");
+				}
+			}
+			else
+			{
+				ModelState.AddModelError("", "Некорректные данные");
+				return View("Edit", model);
+			}
+		}
+
+		[Authorize]
+		[Route("MyPage")]
+		[HttpGet]
+		public IActionResult MyPage()
+		{
+			var user = User;
+
+			var result = _userManager.GetUserAsync(user);
+
+			return View("User", new UserViewModel(result.Result));
 		}
 
 		[Route("Logout")]
