@@ -23,9 +23,19 @@ namespace MyNetwork
             IMapper mapper = mapperConfig.CreateMapper();
 
             builder.Services.AddSingleton(mapper);
+            builder.Logging.ClearProviders();
+            builder.Logging.AddConsole();
+
+            //builder.Services.AddAuthorization(options =>
+            //{
+            //    options.AddPolicy("EmployeeOnly", policy => policy.RequireClaim("EmployeeNumber"));
+            //});
 
             builder.Services
                 .AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connection))
+                .AddUnitOfWork()
+                    .AddCustomRepository<Message, MessageRepository>()
+                    .AddCustomRepository<Friend, FriendsRepository>()
                 .AddIdentity<User, IdentityRole>(opts => {
                     opts.Password.RequiredLength = 5;
                     opts.Password.RequireNonAlphanumeric = false;
@@ -33,14 +43,12 @@ namespace MyNetwork
                     opts.Password.RequireUppercase = false;
                     opts.Password.RequireDigit = false;
                 })
+                .AddDefaultUI()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
-            builder.Services
-                .AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connection))
-                .AddUnitOfWork()
-                .AddCustomRepository<Friend, FriendsRepository>();
+            //builder.Services.AddHealthChecks();
 
-            // Add services to the container.
-            builder.Services.AddControllersWithViews();
+			// Add services to the container.
+			builder.Services.AddControllersWithViews();
             builder.Services.AddRazorPages();
 
             var app = builder.Build();
@@ -52,23 +60,32 @@ namespace MyNetwork
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+            else
+            {
+                app.UseDeveloperExceptionPage();
+                app.UseDatabaseErrorPage();
+            }
 
             app.UseHttpsRedirection();
             var cachePeriod = "0";
             app.UseStaticFiles(new StaticFileOptions
-            {
-                OnPrepareResponse = ctx =>
                 {
-                    ctx.Context.Response.Headers.Append("Cache-Control", $"public, max-age={cachePeriod}");
-                }
-            });
+                    OnPrepareResponse = ctx =>
+                    {
+                        ctx.Context.Response.Headers.Append("Cache-Control", $"public, max-age={cachePeriod}");
+                    }
+                });
 
             app.UseRouting();
 
             app.UseAuthorization();
             app.UseAuthentication();
 
-            app.UseEndpoints(endpoints =>
+            //app.MapHealthChecks("/Chat").RequireAuthorization();
+
+
+            app.MapRazorPages();
+			app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
                     name: "default",

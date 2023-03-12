@@ -1,6 +1,4 @@
-﻿using MyNetwork.Models.Users;
-
-namespace MyNetwork.Data.Repository
+﻿namespace MyNetwork.Models.Users
 {
     public class Friend
     {

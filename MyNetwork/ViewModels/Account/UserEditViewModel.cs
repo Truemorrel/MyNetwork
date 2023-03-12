@@ -4,6 +4,7 @@ namespace MyNetwork.ViewModels.Account
 {
 	public class UserEditViewModel
 	{
+        private string _userName = null!;
         [Required]
         [Display(Name = "Идентификатор пользователя")]
         public string UserId { get; set; }
@@ -18,7 +19,7 @@ namespace MyNetwork.ViewModels.Account
         
         [DataType(DataType.Text)]
         [Display(Name = "Отчество", Prompt = "Введите отчество")]
-        public string MiddleName { get; set; } = null!;
+        public string? MiddleName { get; set; }// = null!;
         
 		[DataType(DataType.Text)]
         [Display(Name = "Имя", Prompt = "Введите имя")]
@@ -26,12 +27,19 @@ namespace MyNetwork.ViewModels.Account
         
         [EmailAddress]
         [Display(Name = "Email", Prompt = "example.com")]
-        public string? Email { get; set; }
-        
-        [DataType(DataType.Date)]
+        public string Email { get; set; } = null!;
+
+		[DataType(DataType.Date)]
         [Display(Name = "Дата рождения")]
         public DateTime BirthDate { get; set; }
-		public string? UserName { get; set; } // UserName => Email;
+
+        [DataType(DataType.Text)]
+        public string UserName => _userName ?? Email;
+
+        //{
+        //    get => _userName;
+        //    set => _userName = value ?? Email;
+        //} 
         
         [DataType(DataType.Text)]
         [Display(Name = "Статус", Prompt = "Введите статус")]

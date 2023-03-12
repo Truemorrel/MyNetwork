@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
-using MyNetwork.Data.Repository;
+using MyNetwork.Models.Users;
 
 namespace MyNetwork.Configs
 {

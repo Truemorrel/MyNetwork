@@ -21,37 +21,37 @@ namespace MyNetwork.Data.Repository
             Set = set;
         }
 
-        public void Create(T item)
+        public async Task Create(T item)
         {
             Set.Add(item);
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
         }
 
-        public void Delete(T item)
+        public async Task Delete(T item)
         {
             Set.Remove(item);
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
         }
 
-        public T Get(int id)
+        public async Task<T?> Get(int id)
         {
-            return Set.Find(id);
+            return await Set.FindAsync(id);
         }
 
-        public IEnumerable<T> GetAll()
+        public async Task<IEnumerable<T?>?> GetAll()
         {
-            return Set;
+            return await Task.Run(() => Set);
         }
 
-        public void Update(T item)
+        public async Task Update(T item)
         {
             Set.Update(item);
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
         }
 
-        public void Delete(int id)
+        public async Task Delete(int id)
         {
-            throw new NotImplementedException();
+            await Task.Run(() => throw new NotImplementedException());
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿@using Microsoft.AspNetCore.Identity;
 @using MyNetwork.Models.Users;
-@inject SignInManager<User> SignInManager
+@inject SignInManager<User> SignInManager;
 @inject UserManager<User> UserManager;
 
 @model MyNetwork.ViewModels.Account.MainViewModel;
@@ -26,8 +26,8 @@ else
 		</div>
 
 		<div class="main">
-			<partial name="Login" model="Model.LoginView" />
-			<partial name="Register" model="Model.RegisterView" />
+			<partial name="Login" model="@Model.LoginView" />
+			<partial name="Register" model="@Model.RegisterView" />
 		</div>
 	</div>
 }

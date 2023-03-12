@@ -3,6 +3,7 @@ using Azure.Core;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using MyNetwork.Data;
 using MyNetwork.Data.Repository;
 using MyNetwork.Data.UoW;
 using MyNetwork.Extentions;
@@ -15,8 +16,8 @@ namespace MyNetwork.Controllers.Account
 {
     public class AccountManagerController : Controller
     {
-        private readonly IMapper _mapper;
-        private readonly IUnitOfWork _unitOfWork;
+        private IMapper _mapper;
+        private IUnitOfWork _unitOfWork;
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
 
@@ -31,13 +32,14 @@ namespace MyNetwork.Controllers.Account
         private async Task<SearchViewModel> CreateSearch(string search)
         {
             var currentuser = User;
-
             var result = await _userManager.GetUserAsync(currentuser);
-
-            var list = _userManager.Users.AsEnumerable().Where(x => x.GetFullName().ToLower().Contains(search.ToLower())).ToList();
             var withfriend = await GetAllFriend();
-
             var data = new List<UserWithFriendExt>();
+            var list = _userManager.Users.AsEnumerable().ToList();
+            if (!string.IsNullOrEmpty(search))
+            {
+                list = list.Where(x => x.GetFullName().ToLower().Contains(search.ToLower())).ToList();
+            }
             list.ForEach(x =>
             {
                 var t = _mapper.Map<UserWithFriendExt>(x);
@@ -49,26 +51,14 @@ namespace MyNetwork.Controllers.Account
             {
                 UserList = data
             };
-
             return model;
         }
 
-        private async Task<List<User>> GetAllFriend(User user)
+        private async Task<List<User?>?> GetAllFriend(User user)
         {
             var repository = _unitOfWork.GetRepository<Friend>() as FriendsRepository;
 
-            return repository.GetFriendsByUser(user);
-        }
-
-        private async Task<List<User>> GetAllFriend()
-        {
-            var user = User;
-
-            var result = await _userManager.GetUserAsync(user);
-
-            var repository = _unitOfWork.GetRepository<Friend>() as FriendsRepository;
-
-            return repository.GetFriendsByUser(result);
+            return await repository.GetFriendsByUser(user);
         }
 
         //private async Task<List<User>> GetAllFriend()
@@ -82,21 +72,36 @@ namespace MyNetwork.Controllers.Account
         //    return repository.GetFriendsByUser(result);
         //}
 
+        private async Task<List<User>> GetAllFriend()
+        {
+            var user = User;
+
+            var result = await _userManager.GetUserAsync(user);
+
+            var repository = _unitOfWork.GetRepository<Friend>() as FriendsRepository;
+
+            return await repository!.GetFriendsByUser(result!);
+        }
+
+        [AllowAnonymous]
         [Route("Login")]
         [HttpGet]
-        public IActionResult Login()
+		[ValidateAntiForgeryToken]
+		public IActionResult Login()
         {
             return View("Home/Login");
         }
 
-		[Route("Login")]
+        [AllowAnonymous]
+        [Route("Login")]
 		[HttpGet]
-        public IActionResult Login(string? returnUrl = null)
+        public IActionResult Login(string returnUrl = null!)
         {
             return View(new LoginViewModel { ReturnUrl = returnUrl }) ;
         }
 
-		[Route("Login")]
+        [AllowAnonymous]
+        [Route("Login")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model)
@@ -104,35 +109,24 @@ namespace MyNetwork.Controllers.Account
             if (ModelState.IsValid)
             {
                 var user = _mapper.Map<User>(model);
-                var userByEmail = await _userManager.FindByEmailAsync(user.Email!);
-				var result = await _signInManager.PasswordSignInAsync(userByEmail!, model.Password!, isPersistent: model.RememberMe, false);
+                var userByEmail = await _userManager.FindByEmailAsync(user.Email);
+				var result = await _signInManager.PasswordSignInAsync(userByEmail, model.Password, isPersistent: model.RememberMe, false);
 
 				if (result.Succeeded)
                 {
-                    if (!string.IsNullOrEmpty(model.ReturnUrl) && Url.IsLocalUrl(model.ReturnUrl))
-                    {
-                        return Redirect(model.ReturnUrl);
-                    }
-                    else
-                    {
 						return RedirectToAction("MyPage", "AccountManager");
-					}
                 }
                 else
                 {
                     ModelState.AddModelError("", "Неправильный логин и (или) пароль");
-                    return View("Views/Home/Index.cshtml",
-                        new MainViewModel {
-                            LoginView = model,
-                            RegisterView = new RegisterViewModel()
-                        }
-                        );
+                    //return View("Views/Home/Index.cshtml", new MainViewModel {LoginView = model, RegisterView = new RegisterViewModel()});
                 }
             }
-            return View("Views/Home/Index.cshtml");// return View("Views/Home/Index.cshtml", model)
+            return RedirectToAction("Index", "Home"); // return View("Views/Home/Index.cshtml");// return View("Views/Home/Index.cshtml", model)
 
-		}
+        }
 
+        [AllowAnonymous]
         [Route("UserList")]
         [HttpGet]
         public async Task<IActionResult> UserList(string search)
@@ -141,29 +135,30 @@ namespace MyNetwork.Controllers.Account
             return View("UserList", model);
         }
 
-        //      [Route("UserList")]
-        //[HttpPost]
-        //public IActionResult UserList()
-        //{
-        //	var model = new SearchViewModel
-        //	{
-        //		UserList = _userManager.Users.ToList()
-        //	};
-        //	return View("UserList", model);
-        //}
+		//[Route("UserList")]
+		//[HttpPost]
+		//public IActionResult UserList()
+		//{
+		//	var model = new SearchViewModel
+		//	{
+		//		UserList = _userManager.Users.ToList()
+		//	};
+		//	return View("UserList", model);
+		//}
 
-        //[Route("UserList")]
-        //[HttpPost]
-        //public IActionResult UserList(string search)
-        //{
-        //    var model = new SearchViewModel
-        //    {
-        //        UserList = _userManager.Users.AsEnumerable().Where(x => x.GetFullName().Contains(search)).ToList()
-        //    };
-        //    return View("UserList", model);
-        //}
+		//[Route("UserList")]
+		//[HttpPost]
+		//public IActionResult UserList(string search)
+		//{
+		//    var model = new SearchViewModel
+		//    {
+		//        UserList = _userManager.Users.AsEnumerable().Where(x => x.GetFullName().Contains(search)).ToList()
+		//    };
+		//    return View("UserList", model);
+		//}
 
-        [Route("AddFriend")]
+		[AllowAnonymous]
+		[Route("AddFriend")]
         [HttpPost]
         public async Task<IActionResult> AddFriend(string id)
         {
@@ -198,9 +193,24 @@ namespace MyNetwork.Controllers.Account
 
         }
 
-        [Authorize]
+        [AllowAnonymous]
+        [Route("Edit")]
+        [HttpGet]
+        public IActionResult Edit()
+        {
+            var user = User;
+
+            var result = _userManager.GetUserAsync(user);
+
+            var editmodel = _mapper.Map<UserEditViewModel>(result.Result);
+
+            return View("Edit", editmodel);
+        }
+
+        [AllowAnonymous]
 		[Route("Update")]
 		[HttpPost]
+		[ValidateAntiForgeryToken]
 		public async Task<IActionResult> Update(UserEditViewModel model)
 		{
 			if (ModelState.IsValid)
@@ -226,20 +236,21 @@ namespace MyNetwork.Controllers.Account
 			}
 		}
 
-		//[Authorize]
-		//[Route("MyPage")]
-		//[HttpGet]
-		//public IActionResult MyPage()
-		//{
-		//	var user = User;
+        //[Authorize]
+        //[Route("MyPage")]
+        //[HttpGet]
+        //public IActionResult MyPage()
+        //{
+        //	var user = User;
 
-		//	var result = _userManager.GetUserAsync(user);
+        //	var result = _userManager.GetUserAsync(user);
 
-		//	return View("User", new UserViewModel(result.Result));
-		//}
+        //	return View("User", new UserViewModel(result.Result));
+        //}
 
+        //[Authorize(Policy = "EmployeeOnly")]
 
-        [Authorize]
+        [AllowAnonymous]
         [Route("MyPage")]
         [HttpGet]
         public async Task<IActionResult> MyPage()
@@ -255,8 +266,121 @@ namespace MyNetwork.Controllers.Account
             return View("User", model);
         }
 
+		private async Task<ChatViewModel> GenerateChat(string id)
+		{
+			var currentuser = User;
+
+			var result = await _userManager.GetUserAsync(currentuser);
+			var friend = await _userManager.FindByIdAsync(id);
+
+			var repository = _unitOfWork.GetRepository<Message>() as MessageRepository;
+
+			var mess = await repository.GetMessages(result, friend);
+
+			var model = new ChatViewModel()
+			{
+				You = result,
+				ToWhom = friend,
+				History = mess.OrderBy(x => x.Id).ToList(),
+			};
+
+			return model;
+		}
+
+		[AllowAnonymous]
+		[Route("Chat")]
+		[HttpGet]
+		public async Task<IActionResult> Chat()
+		{
+
+			var id = Request.Query["id"];
+
+			var model = await GenerateChat(id!);
+			return View("Chat", model);
+		}
+
+		[AllowAnonymous]
+		[Route("Chat")]
+		[HttpPost]
+		[ValidateAntiForgeryToken]
+		public async Task<IActionResult> Chat(string  id)
+		{
+			var currentuser = User;
+
+			var result = await _userManager.GetUserAsync(currentuser);
+			var friend = await _userManager.FindByIdAsync(id);
+
+			var repository = _unitOfWork.GetRepository<Message>() as MessageRepository;
+
+			var mess = await repository.GetMessages(result, friend);
+
+			var model = new ChatViewModel()
+			{
+				You = result,
+				ToWhom = friend,
+				History = mess.OrderBy(x => x.Id).ToList(),
+			};
+			return View("Chat", model) ;
+			
+		}
+
+        [AllowAnonymous]
+        [Route("Generate")]
+        [HttpGet]
+        public async Task<IActionResult> Generate()
+        {
+
+            var usergen = new GenetateUsers();
+            var userlist = usergen.Populate(35);
+
+            foreach (var user in userlist)
+            {
+                var result = await _userManager.CreateAsync(user, "123456");
+
+                if (!result.Succeeded)
+                    continue;
+            }
+
+            return RedirectToAction("Index", "Home");
+        }
 
 
+        [AllowAnonymous]
+		[Route("NewMessage")]
+		[HttpPost]
+		public async Task<IActionResult> NewMessage(string id, ChatViewModel chat)
+		{
+			var currentuser = User;
+
+			var result = await _userManager.GetUserAsync(currentuser);
+			var friend = await _userManager.FindByIdAsync(id);
+
+			var repository = _unitOfWork.GetRepository<Message>() as MessageRepository;
+
+			if (!string.IsNullOrEmpty(chat.NewMessage.Text))
+			{
+				var item = new Message()
+				{
+					Sender = result,
+					Recipient = friend,
+					Text = chat.NewMessage.Text,
+				};
+				await repository.Create(item);
+			}
+
+			var mess = await repository.GetMessages(result, friend);
+
+			var model = new ChatViewModel()
+			{
+				You = result,
+				ToWhom = friend,
+				History = mess.OrderBy(x => x.Id).ToList(),
+			};
+			return View("Chat", model); // View("Chat", model)
+		}
+
+
+		[AllowAnonymous]
         [Route("Logout")]
 		[HttpPost]
 		[ValidateAntiForgeryToken]

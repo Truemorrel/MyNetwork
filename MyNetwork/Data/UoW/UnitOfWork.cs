@@ -7,7 +7,7 @@ namespace MyNetwork.Data.UoW
     {
         private ApplicationDbContext _appContext;
 
-        private Dictionary<Type, object> _repositories;
+        private Dictionary<Type, object> _repositories = default!;
 
         public UnitOfWork(ApplicationDbContext app)
         {

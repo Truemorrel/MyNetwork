@@ -23,6 +23,10 @@
             color: white;
         }
 
+.righ-align {
+    float: right;
+}
+
     .topnav .search-container {
         float: right;
     }

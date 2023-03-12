@@ -8,7 +8,7 @@ namespace MyNetwork.ViewModels.Account
         [Required]
         [EmailAddress]
         [Display(Name = "Email", Prompt = "введите email")]
-        public string? Email { get; set; }
+        public string Email { get; set; } = null!;
 
         [Required]
         [DataType(DataType.Password)]
@@ -18,6 +18,6 @@ namespace MyNetwork.ViewModels.Account
         [Display(Name = "Запомнить?")]
         public bool RememberMe { get; set; }
 
-        public string? ReturnUrl { get; set; }
+        public string? ReturnUrl { get; set; } //= null!;
     }
 }

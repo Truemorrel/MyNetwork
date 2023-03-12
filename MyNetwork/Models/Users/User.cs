@@ -8,7 +8,7 @@ namespace MyNetwork.Models.Users
 
         public string LastName { get; set; } = null!;
 
-		public string MiddleName { get; set; } = null!;
+		public string? MiddleName { get; set; }// = null!;
 
 		public DateTime BirthDate { get; set; }
 
