@@ -1,0 +1,55 @@
+﻿@model MyNetwork.ViewModels.Account.SearchViewModel;
+
+<div class="block-reg background-white center">
+    <label class="gray-text">Список друзей</label>
+
+    @if (Model.UserList.Count != 0)
+    {
+        @foreach (var user in @Model.UserList)
+        {
+            <div>
+                @if (!@user.IsFriendWithCurrent)
+                {
+                    <div class="mrgn">
+                        <img src="@user.Image" class="ava" />
+                    </div>
+                    <div class="mrgn">
+						@user.GetFullName()
+                    </div>
+					<div class="mrgn" class="ava">
+                        <div class="ava">
+                            <label class="ava">
+								@user.About"
+                            </label>
+						</div>
+                        <div class="ava" >
+                            <label>
+								@user.Status"
+                            </label>
+						</div>
+					</div>
+                    <form asp-controller="AccountManager" asp-action="AddFriend" asp-route-id="@user.Id" method="post">
+                        <button type="submit" class="btn btn-sm btn-primary">
+                            Добавить в друзья
+                        </button>
+                    </form>
+                }
+                else
+                {
+					<img src="@user.Image" class="ava" />
+					<div class="mrgn">
+						@user.GetFullName(): (@user.Email)
+					</div>
+                }
+            </div>
+        }
+    }
+    else
+    {
+        <div>
+            <label> Поиск не дал результатов.</label>
+        </div>
+    }
+</div>
+
+

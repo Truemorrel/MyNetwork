@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MyNetwork.Models;
+using MyNetwork.ViewModels.Account;
 using System.Diagnostics;
 
 namespace MyNetwork.Controllers
@@ -13,11 +14,14 @@ namespace MyNetwork.Controllers
             _logger = logger;
         }
 
+        [Route("")]
+        [Route("[controller]/[action]")]
         public IActionResult Index()
         {
-            return View();
+			return View(new MainViewModel());
         }
 
+        [Route("[action]")]
         public IActionResult Privacy()
         {
             return View();
